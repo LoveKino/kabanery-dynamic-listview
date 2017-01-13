@@ -50,7 +50,10 @@
 
 	document.body.appendChild(InputList({
 	    listData: [],
-	    title: 'test'
+	    title: 'test',
+	    onchange: (data) => {
+	        console.log(JSON.stringify(data));
+	    }
 	}));
 
 
@@ -77,11 +80,14 @@
 	module.exports = ({
 	    listData,
 	    defaultItem,
-	    title
+	    title,
+	    onchange = id
 	}) => {
 	    return dynamicList({
 	        listData,
 	        defaultItem,
+	        // append or delete items happend
+	        onchangeList: () => onchange(listData),
 	        render: ({
 	            appendItem, deleteItem, listData
 	        }) => {
@@ -115,6 +121,7 @@
 	                        n('input type="text"', mergeMap({
 	                            onkeyup: (e) => {
 	                                item.value = e.target.value;
+	                                onchange(listData);
 	                            }
 	                        }, item)),
 
@@ -129,7 +136,7 @@
 	                                display: 'inline-block',
 	                                marginLeft: 5
 	                            }
-	                        },[
+	                        }, [
 	                            line({
 	                                length: 10,
 	                                bold: 3,
@@ -143,6 +150,8 @@
 	        }
 	    });
 	};
+
+	const id = v => v;
 
 
 /***/ },
@@ -176,7 +185,8 @@
 	module.exports = view(({
 	    listData,
 	    defaultItem,
-	    render
+	    render,
+	    onchangeList = id,
 	}, {
 	    update
 	}) => {
@@ -188,6 +198,7 @@
 	            value = mergeMap(defaultItem);
 	        }
 	        listData.push(value);
+	        onchangeList(value, 'append', listData);
 	        // update view
 	        update();
 	    };
@@ -197,6 +208,7 @@
 	        if (index !== -1) {
 	            listData.splice(index, 1);
 	            // update view
+	            onchangeList(item, index, 'delete', listData);
 	            update();
 	        }
 	    };
@@ -207,6 +219,8 @@
 	        deleteItem
 	    });
 	});
+
+	const id = v => v;
 
 
 /***/ },
