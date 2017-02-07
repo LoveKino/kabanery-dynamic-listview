@@ -48,12 +48,39 @@
 
 	let InputList = __webpack_require__(1);
 
+	let {
+	    n
+	} = __webpack_require__(7);
+
 	document.body.appendChild(InputList({
-	    listData: [],
+	    value: [{
+	        value: '123'
+	    }],
 	    title: 'test',
 	    onchange: (data) => {
-	        console.log(JSON.stringify(data));
+	        console.log(JSON.stringify(data)); // eslint-disable-line
 	    }
+	}));
+
+	document.body.appendChild(n('br'));
+
+	document.body.appendChild(InputList({
+	    value: [{
+	        value: [{
+	            value: '1234567'
+	        }]
+	    }],
+	    title: 'test',
+	    onchange: (data) => {
+	        console.log(JSON.stringify(data)); // eslint-disable-line
+	    },
+	    defaultItem: {
+	        value: [{
+	            value: '10'
+	        }]
+	    },
+
+	    itemRender: InputList
 	}));
 
 
@@ -77,19 +104,35 @@
 
 	let line = __webpack_require__(36);
 
+	let Input = ({
+	    value = '', onchange, type, style, placehoder = ''
+	}) => {
+	    return n(`input type="${type}" placehoder="${placehoder}"`, {
+	        value,
+	        style,
+	        oninput: (e) => {
+	            onchange && onchange(e.target.value);
+	        }
+	    });
+	};
+
 	module.exports = ({
-	    listData,
+	    value,
 	    defaultItem,
 	    title,
-	    onchange = id
+	    onchange = id, itemRender = Input
 	}) => {
 	    return dynamicList({
-	        listData,
-	        defaultItem,
 	        // append or delete items happend
-	        onchangeList: () => onchange(listData),
+	        onchange: () => onchange(value),
+
+	        value,
+
+
+	        defaultItem,
+
 	        render: ({
-	            appendItem, deleteItem, listData
+	            appendItem, deleteItem, value
 	        }) => {
 	            return n('div', {
 	                style: {
@@ -116,14 +159,14 @@
 	                    })))
 	                ]),
 
-	                map(listData, (item) => {
+	                map(value, (item) => {
 	                    return n('fieldset', [
-	                        n('input type="text"', mergeMap({
-	                            onkeyup: (e) => {
-	                                item.value = e.target.value;
-	                                onchange(listData);
+	                        itemRender(mergeMap(item, {
+	                            onchange: (v) => {
+	                                item.value = v;
+	                                onchange(value);
 	                            }
-	                        }, item)),
+	                        })),
 
 	                        n('span', {
 	                            style: {
@@ -161,7 +204,7 @@
 	'use strict';
 
 	let {
-	    findIndex, mergeMap
+	    findIndex
 	} = __webpack_require__(3);
 
 	let {
@@ -180,41 +223,39 @@
 	 *   (4) maintain list data
 	 *
 	 * @param render function
-	 *  render dom by listData
+	 *  render dom by value
 	 */
 	module.exports = view(({
-	    listData,
-	    defaultItem,
-	    render,
-	    onchangeList = id,
+	    value,
+	    defaultItem = {}, render, onchange = id,
 	}, {
 	    update
 	}) => {
 	    let appendItem = () => {
-	        let value = defaultItem;
+	        let item = defaultItem;
 	        if (isFunction(defaultItem)) {
-	            value = defaultItem();
+	            item = defaultItem();
 	        } else {
-	            value = mergeMap(defaultItem);
+	            item = JSON.parse(JSON.stringify(defaultItem));
 	        }
-	        listData.push(value);
-	        onchangeList(value, 'append', listData);
+	        value.push(item);
+	        onchange(value, 'append', item);
 	        // update view
 	        update();
 	    };
 
 	    let deleteItem = (item) => {
-	        let index = findIndex(listData, item);
+	        let index = findIndex(value, item);
 	        if (index !== -1) {
-	            listData.splice(index, 1);
+	            value.splice(index, 1);
 	            // update view
-	            onchangeList(item, index, 'delete', listData);
+	            onchange(item, index, 'delete', value);
 	            update();
 	        }
 	    };
 
 	    return render({
-	        listData,
+	        value,
 	        appendItem,
 	        deleteItem
 	    });
