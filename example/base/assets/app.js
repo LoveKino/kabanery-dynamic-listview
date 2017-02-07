@@ -52,35 +52,39 @@
 	    n
 	} = __webpack_require__(7);
 
+	let {
+	    mergeMap
+	} = __webpack_require__(3);
+
 	document.body.appendChild(InputList({
-	    value: [{
-	        value: '123'
-	    }],
+	    value: ['123'],
 	    title: 'test',
 	    onchange: (data) => {
 	        console.log(JSON.stringify(data)); // eslint-disable-line
+	    },
+	    itemOptions: {
+	        placeholder: 'test'
 	    }
 	}));
 
 	document.body.appendChild(n('br'));
 
 	document.body.appendChild(InputList({
-	    value: [{
-	        value: [{
-	            value: '1234567'
-	        }]
-	    }],
+	    value: [
+	        [
+	            '1234567'
+	        ]
+	    ],
 	    title: 'test',
 	    onchange: (data) => {
 	        console.log(JSON.stringify(data)); // eslint-disable-line
 	    },
-	    defaultItem: {
-	        value: [{
-	            value: '10'
-	        }]
-	    },
-
-	    itemRender: InputList
+	    defaultItem: [''],
+	    itemRender: (opts = {}) => InputList(mergeMap(opts, {
+	        itemOptions: {
+	            placeholder: 'haha!'
+	        }
+	    }))
 	}));
 
 
@@ -105,9 +109,9 @@
 	let line = __webpack_require__(36);
 
 	let Input = ({
-	    value = '', onchange, type, style, placehoder = ''
+	    value = '', onchange, type = 'text', style, placeholder = ''
 	}) => {
-	    return n(`input type="${type}" placehoder="${placehoder}"`, {
+	    return n(`input type="${type}" placeholder="${placeholder}"`, {
 	        value,
 	        style,
 	        oninput: (e) => {
@@ -120,14 +124,13 @@
 	    value,
 	    defaultItem,
 	    title,
-	    onchange = id, itemRender = Input
+	    itemOptions = {}, onchange = id, itemRender = Input
 	}) => {
 	    return dynamicList({
 	        // append or delete items happend
 	        onchange: () => onchange(value),
 
 	        value,
-
 
 	        defaultItem,
 
@@ -159,21 +162,24 @@
 	                    })))
 	                ]),
 
-	                map(value, (item) => {
+	                map(value, (item, index) => {
 	                    return n('fieldset', [
-	                        itemRender(mergeMap(item, {
-	                            onchange: (v) => {
-	                                item.value = v;
-	                                onchange(value);
+	                        itemRender(mergeMap(
+	                            itemOptions, {
+	                                value: item,
+	                                onchange: (v) => {
+	                                    value[index] = v;
+	                                    onchange(value);
+	                                }
 	                            }
-	                        })),
+	                        )),
 
 	                        n('span', {
 	                            style: {
 	                                cursor: 'pointer',
 	                                fontWeight: 'bold'
 	                            },
-	                            onclick: () => deleteItem(item)
+	                            onclick: () => deleteItem(item, index)
 	                        }, n('div', {
 	                            style: {
 	                                display: 'inline-block',
@@ -204,10 +210,6 @@
 	'use strict';
 
 	let {
-	    findIndex
-	} = __webpack_require__(3);
-
-	let {
 	    view
 	} = __webpack_require__(7);
 
@@ -227,7 +229,7 @@
 	 */
 	module.exports = view(({
 	    value,
-	    defaultItem = {}, render, onchange = id,
+	    defaultItem = '', render, onchange = id,
 	}, {
 	    update
 	}) => {
@@ -239,17 +241,20 @@
 	            item = JSON.parse(JSON.stringify(defaultItem));
 	        }
 	        value.push(item);
-	        onchange(value, 'append', item);
+	        onchange({
+	            value, type: 'append', item
+	        });
 	        // update view
 	        update();
 	    };
 
-	    let deleteItem = (item) => {
-	        let index = findIndex(value, item);
+	    let deleteItem = (item, index) => {
 	        if (index !== -1) {
 	            value.splice(index, 1);
 	            // update view
-	            onchange(item, index, 'delete', value);
+	            onchange({
+	                item, index, type: 'delete', value
+	            });
 	            update();
 	        }
 	    };
