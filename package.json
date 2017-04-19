@@ -1,6 +1,6 @@
 {
   "name": "kabanery-dynamic-listview",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "dynamic list view based on kabanery",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "basetype": "^0.1.4",
     "bolzano": "^0.1.0",
     "css-shapes-object": "0.0.2",
-    "kabanery": "^0.1.2"
+    "kabanery": "^0.1.8"
   },
   "devDependencies": {
     "webpack": "^1.14.0"

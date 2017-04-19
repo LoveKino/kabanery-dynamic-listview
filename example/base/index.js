@@ -3,14 +3,14 @@
 let InputList = require('../../lib/inputList');
 
 let {
-    n
+    n, mount
 } = require('kabanery');
 
 let {
     mergeMap
 } = require('bolzano');
 
-document.body.appendChild(InputList({
+mount(InputList({
     value: ['123'],
     title: 'test',
     onchange: (data) => {
@@ -19,11 +19,11 @@ document.body.appendChild(InputList({
     itemOptions: {
         placeholder: 'test'
     }
-}));
+}), document.body);
 
-document.body.appendChild(n('br'));
+mount(n('br'), document.body);
 
-document.body.appendChild(InputList({
+mount(InputList({
     value: [
         [
             '1234567'
@@ -39,4 +39,4 @@ document.body.appendChild(InputList({
             placeholder: 'haha!'
         }
     }))
-}));
+}), document.body);
