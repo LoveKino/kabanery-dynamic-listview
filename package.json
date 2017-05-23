@@ -1,6 +1,6 @@
 {
   "name": "kabanery-dynamic-listview",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "dynamic list view based on kabanery",
   "main": "index.js",
   "scripts": {
