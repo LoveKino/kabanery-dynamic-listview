@@ -25,7 +25,7 @@
     "basetype": "^0.1.4",
     "bolzano": "^0.1.1",
     "css-shapes-object": "0.0.2",
-    "kabanery": "^0.2.0"
+    "kabanery": "^0.2.1"
   },
   "devDependencies": {
     "webpack": "^1.14.0"
